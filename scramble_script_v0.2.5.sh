@@ -12,8 +12,8 @@ pwd
 # Download files using aria2
 cd /
 
-#gunzip -c /project/003_MSc_MEI_detection/references/hg19/hs37d5.fa.gz > scratch/hs37d5.fa
-#samtools faidx /scratch/hs37d5.fa -o /scratch/hs37d5.fa.fai
+#gunzip -c project/003_MSc_MEI_detection/references/hg19/hs37d5.fa.gz > scratch/hs37d5.fa
+#samtools faidx scratch/hs37d5.fa -o scratch/hs37d5.fa.fai
 
 # Download files using aria2
 cd scratch/
@@ -43,7 +43,7 @@ Rscript --vanilla /app/cluster_analysis/bin/SCRAMble.R \
     --eval-meis
 
 #make directory for output files
-#mkdir -p project/003_MSc_MEI_detection/benchmarking_output/"$1"
+#mkdir project/003_MSc_MEI_detection/benchmarking_output/"$1"
 
 # Move output files to the output directory
 mv scratch/*.vcf project/003_MSc_MEI_detection/benchmarking_output/"$1"/
@@ -51,10 +51,6 @@ mv scratch/*.list project/003_MSc_MEI_detection/benchmarking_output/"$1"/
 mv scratch/*.tsv project/003_MSc_MEI_detection/benchmarking_output/"$1"/
 mv scratch/*final* project/003_MSc_MEI_detection/benchmarking_output/"$1"/
 
-rm scratch/*.bam*
-rm scratch/*.vcf
-rm scratch/*.tsv
-rm scratch/*.list
 
 # save the output files
 

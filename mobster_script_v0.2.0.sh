@@ -13,7 +13,7 @@ pwd
 cd /
 
 # To be run prior to setting off.
-#gunzip -c project/003_230901_MSc_MEI_detection/references/hg19/hs37d5.fa.gz > scratch/hs37d5.fa
+#gunzip -c project/003_MSc_MEI_detection/references/hg19/hs37d5.fa.gz > scratch/hs37d5.fa
 #samtools faidx scratch/hs37d5.fa -o scratch/hs37d5.fa.fai
 
 # Download files using aria2
@@ -27,31 +27,25 @@ filename=$3
 aria2c -x 16 -s 16 "${URL}" # -o "${ID}.bam"
 aria2c -x 16 -s 16 "${URL}.bai" # -o "${ID}.bam.bai"
 
-# Run Mobster
+# Run SCRAMBLE
 cd /
 mkdir "scratch/${ID}/"
-cd /home/cwic/mobster/target/
-pwd
-ls
+cd home/cwic/mobster/target/
 java -Xmx8G -jar MobileInsertions-0.2.4.1.jar -properties Mobster.properties -in /scratch/"${filename}" -out "/scratch/${ID}/${ID}_mobster"
 
-cd /home/cwic/mobster/resources/MobsterVCF/
 java -Xmx8G -jar MobsterVCF-0.0.1-SNAPSHOT.jar -file "/scratch/${ID}/${ID}_mobster_predictions.txt" -out "/scratch/${ID}/${ID}_mobster_predictions.vcf"
 
 #make directory for output files
-mkdir -p /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster
+mkdir project/003_MSc_MEI_detection/benchmarking_output/"${ID}/mobster"
 
 # Move output files to the output directory
-mv /scratch/"${ID}"/*.vcf /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*.bam /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*.bai /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*stat* /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*.pdf /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*.dat /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-mv /scratch/"${ID}"/*.fq /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
-
-rm /scratch/*.bam
-rm -r /scratch/"${ID}"/
+mv scratch/"${ID}"/*.vcf project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*.bam project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*.bai project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*stat* project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*.pdf project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*.dat project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
+mv scratch/"${ID}"/*.fq project/003_MSc_MEI_detection/benchmarking_output/"${ID}"/mobster/
 
 # save the output files
 

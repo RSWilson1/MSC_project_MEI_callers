@@ -50,9 +50,6 @@ mkdir -p /project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/scram
 mv /scratch/"${ID}"/*.vcf project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/scramble/
 mv /scratch/"${ID}"/*.txt project/003_230901_MSc_MEI_detection/benchmarking_output/"${ID}"/scramble/
 
-rm scratch/*.bam*
-rm scratch/*.vcf
-
 # save the output files
 
 dx-save-project

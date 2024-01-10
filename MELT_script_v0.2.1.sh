@@ -29,7 +29,7 @@ URL=$2
 # Run MELT
 cd /
 
-mkdir -p /scratch/"$1"/
+mkdir -p scratch/"$1"/
 
 /usr/bin/time --verbose java -jar ./opt/MELTv2.2.2/MELT.jar Single -a -b hs37d5/NC_007605 \
   -h scratch/hs37d5.fa \
@@ -40,16 +40,13 @@ mkdir -p /scratch/"$1"/
 
 
 #make directory for output files
-mkdir -p /project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
+mkdir -p project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
 
 # Move output files to the output directory
 mv scratch/"$1"/*.vcf project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
 mv scratch/"$1"/*.list project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
 mv scratch/"$1"/*.tsv project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
 mv scratch/"$1"/*final* project/003_230901_MSc_MEI_detection/benchmarking_output/"$1"/MELT/
-
-rm scratch/*.bam*
-rm -r scratch/"$1"/
 
 # save the output files
 

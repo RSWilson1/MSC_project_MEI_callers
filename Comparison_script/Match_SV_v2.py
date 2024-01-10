@@ -5,7 +5,7 @@ def parse_args():
     """
     Parses command line arguments.
     Example usage:
-    python Match_SV_v2.py -vcf_baseline /path/to/baseline.vcf -testvcf /path/to/test.vcf -range_limit 50
+    python Match_SV_v2.py -vcf_baseline /path/to/baseline.vcf -testvcf /path/to/test.vcf -range_limit 5
     """
     parser = argparse.ArgumentParser(description="Compare variants in two VCF files.")
     parser.add_argument("-vcf_baseline", required=True, help="Path to the baseline VCF file.")
@@ -45,12 +45,11 @@ def compare_vcfs(vcf_baseline, testvcf, range_limit):
         total_variants += 1
         chrom = record1.CHROM
         if chrom.startswith("chr"):
-            chrom = chrom[3:]  # Remove "chr" prefix # why not replace?
+            chrom = chrom[3:]  # Remove "chr" prefix
         if chrom not in chrom_variants1:
             chrom_variants1[chrom] = []
         chrom_variants1[chrom].append(record1)
-    print(chrom_variants1)
-    print("Finished reading baseline VCF")
+
     for record2 in vcf_reader_test:
         chrom2 = record2.CHROM
         pos2 = record2.POS
@@ -79,7 +78,7 @@ def compare_vcfs(vcf_baseline, testvcf, range_limit):
 
     shared_percentage = (shared_variants / total_variants) * 100 if total_variants > 0 else 0
 
-    print("Summary Statistics:")
+    print(f"Summary Statistics:")
     print(f"Total variants in baseline VCF: {total_variants}")
     print(f"Variants shared between the two VCFs: {shared_variants}")
     print(f"Percentage of shared variants: {shared_percentage:.2f}%")

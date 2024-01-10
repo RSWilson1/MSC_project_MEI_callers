@@ -3,8 +3,8 @@ import subprocess
 # Define the dictionary containing IDs and URLs
 
 links_dict = {
-    "HG00096": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00096/alignment/HG00096.mapped.ILLUMINA.bwa.GBR.low_coverage.20130415.bam",
-    "HG00268": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00268/alignment/HG00268.mapped.ILLUMINA.bwa.FIN.low_coverage.20130415.bam",
+    # "HG00096": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00096/alignment/HG00096.mapped.ILLUMINA.bwa.GBR.low_coverage.20130415.bam",
+    # "HG00268": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00268/alignment/HG00268.mapped.ILLUMINA.bwa.FIN.low_coverage.20130415.bam",
     "HG00419": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00419/alignment/HG00419.mapped.ILLUMINA.bwa.CHS.low_coverage.20130415.bam",
     "HG00759": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00759/alignment/HG00759.mapped.ILLUMINA.bwa.CDX.low_coverage.20130415.bam",
     "HG01051": "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG01051/alignment/HG01051.mapped.ILLUMINA.bwa.PUR.low_coverage.20120522.bam",
