@@ -122,18 +122,17 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
     print("Finished reading baseline VCF")
 
     for i, record2 in enumerate(test_vcf):
-        print(f"Processing record {i}")
         chrom2 = record2.CHROM
         pos2 = record2.POS
         id2 = record2.ID
-        if svlen:
-            svlen2 = record2.INFO.get('SVLEN') #record2.INFO['SVLEN']
-        elif not svlen:
-            svlen2 = len(record2.ALT[0])
-        else:
-            svlen2 = None
-            # Truth VCF contains no len attribute
-            # print("only truth set")
+        # if svlen:
+        #     svlen2 = record2.INFO.get('SVLEN') #record2.INFO['SVLEN']
+        # elif not svlen:
+        #     svlen2 = len(record2.ALT[0])
+        # else:
+        #     svlen2 = None
+        #     # Truth VCF contains no len attribute
+        #     # print("only truth set")
         if id2 == "DEL":
             continue
 
@@ -156,17 +155,20 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
 
                     if keyword1 is not None and keyword2 is not None and keyword1 == keyword2:
                         shared_variants += 1
+                        info_list = [f"{x[0]}: {x[1]}" for x in record2.INFO]
+                        info_str = ", ".join(info_list)
                         entry = (
                             f"{record2.CHROM} {record2.POS} {record2.ID}",
                             f"{record2.REF} {record2.ALT} {record2.QUAL}",
-                            f"{record2.FILTER} {record2.INFO} {record2.FORMAT}"
+                            f"{record2.FILTER} {info_str} {record2.FORMAT}"
                         )
                         shared_variants_vcf.append(entry)
                         break  # Found a matching position, no need to continue
                     else:
-                        print("No keyword match found") #  {record2}
+                        print("No keyword match found")
                 else:
-                    print("No pos match found") # {record2}
+                    # No matching position found
+                    continue
     return total_variants, shared_variants, shared_variants_vcf
 
 
