@@ -223,13 +223,14 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
     return shared_variants_vcf, shared_percentage, shared_variants, total_variants
 
 
-def run_for_multiple_samples():
+def run_for_multiple_samples(args):
     """
     Run the comparison for multiple samples.
     """
     # Assuming you have a list of sample IDs
-    sample_ids = ["HG00096", "HG00097", "HG00098"]
-
+    # sample_ids = ["HG00096", "HG00097", "HG00098"]
+    #HG00096 HG00268 HG00419 HG00759 HG01051 HG01112 HG01500 HG01565 HG01583 HG01595 HG01879 HG02568 HG02922 HG03006 HG03052 HG03642 HG03742 NA18525 NA18939 NA19017 NA19625 NA19648 NA20502 NA20845 NA12878 NA19238 NA19239 NA19240
+    sample_ids = args.vcf_list
     # Assuming you have a list of tools
     tools = ["MELT", "scramble", "mobster"]
 
@@ -243,6 +244,7 @@ def run_for_multiple_samples():
             #HG00096_scramble.vcf
             #HG00096_mobster_predictions.vcf
             base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+
             if tool == "MELT":
                 test_vcf = f"{base_path}/{sample}/{tool}/{sample}_{tool}_concat.vcf.gz"
             elif tool == "scramble":
@@ -253,10 +255,11 @@ def run_for_multiple_samples():
                 print("No tool found")
                 exit(1)
 
-            vcf_baseline = f"{sample}_{tool}_baseline.vcf"
+            truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+            vcf_baseline = f"{truth_path}Truth_{sample}.vcf"
             # Run the comparison
             shared_variants_vcf, shared_percentage, shared_variants, total_variants = \
-                compare_vcfs(vcf_baseline, test_vcf, 50)
+                compare_vcfs(vcf_baseline, test_vcf, args.range_limit)
             # Create a dictionary with the results
             result_dict = {
                 "Sample_ID": sample,
@@ -273,9 +276,13 @@ def run_for_multiple_samples():
     df = pd.DataFrame(results)
 
     # Write the DataFrame to a CSV file
-    csv_filename = "results.csv"
+    csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
 if __name__ == "__main__":
     args = parse_args()
-    compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
+    if args.mode == "single":
+        compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
+    elif args.mode == "multi":
+        run_for_multiple_samples(args)
+    #compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
