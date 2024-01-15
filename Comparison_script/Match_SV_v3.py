@@ -27,17 +27,28 @@ def parse_args():
     """
     Parses command line arguments.
     Example usage:
-    python Match_SV_v2.py -vcf_baseline /path/to/baseline.vcf -test_vcf /path/to/test.vcf -range_limit 50
+    Single Sample Mode: python Match_SV_v2.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
+    Multi-Sample Mode: python Match_SV_v2.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
     """
-    parser = argparse.ArgumentParser(description="Compare variants in two VCF files.")
-    parser.add_argument("-vcf_baseline", required=True, help="Path to the baseline VCF file.")
-    parser.add_argument("-test_vcf", required=True, help="Path to the test VCF file.")
+    parser = argparse.ArgumentParser(description="Compare variants in VCF files.")
+
     parser.add_argument("-range_limit", type=int, default=50, help="Position range within which variants are considered similar.")
+
+    # mode_group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument("mode", choices=["single", "multi"], help="Choose between single and multi-sample mode.")
+
+    # Single-sample mode sub-arguments
+    single_group = parser.add_argument_group("Single Sample Mode Options")
+    single_group.add_argument("-baseline", dest="vcf_baseline", help="Path to the baseline VCF file for single-sample mode.")
+    single_group.add_argument("-test", dest="test_vcf", help="Path to the test VCF file for single-sample mode.")
+
+    # Multi-sample mode sub-arguments
+    multi_group = parser.add_argument_group("Multi Sample Mode Options")
+    multi_group.add_argument("-vcf_list", nargs="+", help="List of VCF files for multi-sample mode.")
 
     arguments = parser.parse_args()
 
     return arguments
-
 
 def get_MEI_caller(file_path):
     """
@@ -212,13 +223,14 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
     return shared_variants_vcf, shared_percentage, shared_variants, total_variants
 
 
-def run_for_multiple_samples():
+def run_for_multiple_samples(args):
     """
     Run the comparison for multiple samples.
     """
     # Assuming you have a list of sample IDs
-    sample_ids = ["HG00096", "HG00097", "HG00098"]
-
+    # sample_ids = ["HG00096", "HG00097", "HG00098"]
+    #HG00096 HG00268 HG00419 HG00759 HG01051 HG01112 HG01500 HG01565 HG01583 HG01595 HG01879 HG02568 HG02922 HG03006 HG03052 HG03642 HG03742 NA18525 NA18939 NA19017 NA19625 NA19648 NA20502 NA20845 NA12878 NA19238 NA19239 NA19240
+    sample_ids = args.vcf_list
     # Assuming you have a list of tools
     tools = ["MELT", "scramble", "mobster"]
 
@@ -232,6 +244,7 @@ def run_for_multiple_samples():
             #HG00096_scramble.vcf
             #HG00096_mobster_predictions.vcf
             base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+
             if tool == "MELT":
                 test_vcf = f"{base_path}/{sample}/{tool}/{sample}_{tool}_concat.vcf.gz"
             elif tool == "scramble":
@@ -242,10 +255,11 @@ def run_for_multiple_samples():
                 print("No tool found")
                 exit(1)
 
-            vcf_baseline = f"{sample}_{tool}_baseline.vcf"
+            truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+            vcf_baseline = f"{truth_path}Truth_{sample}.vcf"
             # Run the comparison
             shared_variants_vcf, shared_percentage, shared_variants, total_variants = \
-                compare_vcfs(vcf_baseline, test_vcf, 50)
+                compare_vcfs(vcf_baseline, test_vcf, args.range_limit)
             # Create a dictionary with the results
             result_dict = {
                 "Sample_ID": sample,
@@ -262,9 +276,13 @@ def run_for_multiple_samples():
     df = pd.DataFrame(results)
 
     # Write the DataFrame to a CSV file
-    csv_filename = "results.csv"
+    csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
 if __name__ == "__main__":
     args = parse_args()
-    compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
+    if args.mode == "single":
+        compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
+    elif args.mode == "multi":
+        run_for_multiple_samples(args)
+    #compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
