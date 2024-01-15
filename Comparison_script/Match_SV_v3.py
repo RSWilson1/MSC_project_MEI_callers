@@ -27,17 +27,28 @@ def parse_args():
     """
     Parses command line arguments.
     Example usage:
-    python Match_SV_v2.py -vcf_baseline /path/to/baseline.vcf -test_vcf /path/to/test.vcf -range_limit 50
+    Single Sample Mode: python Match_SV_v2.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
+    Multi-Sample Mode: python Match_SV_v2.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
     """
-    parser = argparse.ArgumentParser(description="Compare variants in two VCF files.")
-    parser.add_argument("-vcf_baseline", required=True, help="Path to the baseline VCF file.")
-    parser.add_argument("-test_vcf", required=True, help="Path to the test VCF file.")
+    parser = argparse.ArgumentParser(description="Compare variants in VCF files.")
+
     parser.add_argument("-range_limit", type=int, default=50, help="Position range within which variants are considered similar.")
+
+    # mode_group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument("mode", choices=["single", "multi"], help="Choose between single and multi-sample mode.")
+
+    # Single-sample mode sub-arguments
+    single_group = parser.add_argument_group("Single Sample Mode Options")
+    single_group.add_argument("-baseline", dest="vcf_baseline", help="Path to the baseline VCF file for single-sample mode.")
+    single_group.add_argument("-test", dest="test_vcf", help="Path to the test VCF file for single-sample mode.")
+
+    # Multi-sample mode sub-arguments
+    multi_group = parser.add_argument_group("Multi Sample Mode Options")
+    multi_group.add_argument("-vcf_list", nargs="+", help="List of VCF files for multi-sample mode.")
 
     arguments = parser.parse_args()
 
     return arguments
-
 
 def get_MEI_caller(file_path):
     """
