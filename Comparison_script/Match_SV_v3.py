@@ -27,8 +27,8 @@ def parse_args():
     """
     Parses command line arguments.
     Example usage:
-    Single Sample Mode: python Match_SV_v2.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
-    Multi-Sample Mode: python Match_SV_v2.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
+    Single Sample Mode: python Match_SV_v3.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
+    Multi-Sample Mode: python Match_SV_v3.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
     """
     parser = argparse.ArgumentParser(description="Compare variants in VCF files.")
 
@@ -256,7 +256,7 @@ def run_for_multiple_samples(args):
                 exit(1)
 
             truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
-            vcf_baseline = f"{truth_path}Truth_{sample}.vcf"
+            vcf_baseline = f"{truth_path}valid_Truth_{sample}.vcf"
             # Run the comparison
             shared_variants_vcf, shared_percentage, shared_variants, total_variants = \
                 compare_vcfs(vcf_baseline, test_vcf, args.range_limit)
