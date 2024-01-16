@@ -35,7 +35,7 @@ links_dict = {
 
 # Loop over the dictionary
 for ID, url in links_dict.items():
-    log_filename = f"{ID}_scramble_log.txt"  # Define the log file name based on ID
+    log_filename = f"{ID}_scramble_log2.txt"  # Define the log file name based on ID
     split_url = url.split("/")  # Split the url by '/'
     filename = split_url[-1]  # Get the last element of the split url
     print(f"Processing {filename}")
