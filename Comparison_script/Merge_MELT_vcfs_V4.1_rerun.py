@@ -16,11 +16,14 @@ def main():
     4. Indexes the compressed VCF file using tabix.
     5. Prints a message indicating that the process for the ID is finished.
     """
-    id_list = ['HG00096', 'HG00268', 'HG00419', 'HG00759', 'HG01051', 'HG01112',
-               'HG01500', 'HG01565', 'HG01583', 'HG01595', 'HG01879', 'HG02568',
-               'HG02922', 'HG03006', 'HG03052', 'HG03642', 'HG03742', 'NA18525',
-               'NA18939', 'NA19017', 'NA19625', 'NA19648', 'NA20502', 'NA20845',
-               'NA12878', 'NA19238', 'NA19239', 'NA19240']
+    # id_list = ['HG00096', 'HG00268', 'HG00419', 'HG00759', 'HG01051', 'HG01112',
+    #            'HG01500', 'HG01565', 'HG01583', 'HG01595', 'HG01879', 'HG02568',
+    #            'HG02922', 'HG03006', 'HG03052', 'HG03642', 'HG03742', 'NA18525',
+    #            'NA18939', 'NA19017', 'NA19625', 'NA19648', 'NA20502', 'NA20845',
+    #            'NA12878', 'NA19238', 'NA19239', 'NA19240']
+
+    id_list = ["HG00096","HG00268","HG00419","HG00759",
+              "HG01051","HG01112","HG01500","HG01565"]
 
     for hg_id in id_list:
         # ALU.final.vcf, SVA.final.vcf, and LINE1.final.vcf are the inputs.
