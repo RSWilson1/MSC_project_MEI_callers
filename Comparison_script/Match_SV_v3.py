@@ -206,8 +206,19 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
     else:
         print("only truth set")
 
-    vcf_reader_base = VCF(vcf_baseline) #vcf.Reader(open(vcf_baseline, 'r'))
-    vcf_reader_test = VCF(test_vcf) #vcf.Reader(open(test_vcf, 'r'))
+    try:
+        vcf_reader_base = VCF(vcf_baseline) #vcf.Reader(open(vcf_baseline, 'r'))
+    except:
+        print("Error opening truth VCF file")
+        # skip to next one
+        return None, None, None, None
+
+    try:
+        vcf_reader_test = VCF(test_vcf) #vcf.Reader(open(test_vcf, 'r'))
+    except:
+        print("Error opening test VCF file")
+        # skip to next one
+        return None, None, None, None
 
     total_variants, shared_variants, shared_variants_vcf = search_vcfs(
         vcf_reader_base, vcf_reader_test, svlen, range_limit
