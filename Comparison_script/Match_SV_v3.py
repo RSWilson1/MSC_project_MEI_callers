@@ -206,14 +206,14 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
     except:
         print("Error opening truth VCF file")
         # skip to next one
-        return None, None, None, None
+        return None, None, None, None, None
 
     try:
         vcf_reader_test = VCF(test_vcf) #vcf.Reader(open(test_vcf, 'r'))
     except:
         print("Error opening test VCF file")
         # skip to next one
-        return None, None, None, None
+        return None, None, None, None, None
 
     truth_total_variants, shared_variants, shared_variants_vcf, test_vcf_variants = search_vcfs(
         vcf_reader_base, vcf_reader_test, range_limit
