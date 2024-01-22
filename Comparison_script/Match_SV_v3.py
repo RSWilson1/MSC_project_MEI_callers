@@ -88,7 +88,7 @@ def within_range(pos1, pos2, range_limit):
     return abs(pos1 - pos2) <= range_limit
 
 
-def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
+def search_vcfs(vcf_baseline, test_vcf, range_limit):
     """
     Search for matching variants in the two VCF files.
 
@@ -98,20 +98,29 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
         The baseline VCF file.
     test_vcf : vcf.Reader
         The test VCF file.
-    svlen : boolean
-        Whether to use svlen or not.
     range_limit : int
         The range limit within which variants are considered similar.
+
+    Returns
+    -------
+    truth_total_variants : int
+        The total number of variants in the baseline VCF.
+    shared_variants : int
+        The number of variants shared between the two VCFs.
+    shared_variants_vcf : list
+        A list of shared variants.
+    test_vcf_variants : int
+        The total number of variants in the test VCF.
     """
-    total_variants = 0
-    shared_variants = 0
+    truth_total_variants = int(0)
+    test_vcf_variants = int(0)
+    shared_variants = int(0)
 
     chrom_variants1 = {}  # Dict to store variants for each chromosome in vcf_baseline
     shared_variants_vcf = []  # List to store shared variants
 
     # Group variants by chromosome in vcf_baseline
     for record1 in vcf_baseline:
-        #total_variants += 1
         chrom = record1.CHROM
         if chrom not in LST_OF_CHRS:
             #print(f"rejected - {chrom}")
@@ -120,7 +129,7 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
         id1 = record1.ID
         if id1 == "DEL":
             continue
-        total_variants += 1
+        truth_total_variants += 1
         if chrom.startswith("chr"):
             #print(chrom)
             #chrom = chrom[3:]  # Remove "chr" prefix # why not replace?
@@ -136,19 +145,14 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
         chrom2 = record2.CHROM
         pos2 = record2.POS
         id2 = record2.ID
-        # if svlen:
-        #     svlen2 = record2.INFO.get('SVLEN') #record2.INFO['SVLEN']
-        # elif not svlen:
-        #     svlen2 = len(record2.ALT[0])
-        # else:
-        #     svlen2 = None
-        #     # Truth VCF contains no len attribute
-        #     # print("only truth set")
+
         if id2 == "DEL":
             continue
 
         if chrom2 not in LST_OF_CHRS:
             continue
+        # Count number of variants in test VCF
+        test_vcf_variants += 1
         if chrom2.startswith("chr"):
             #chrom2 = chrom2[3:]  # Remove "chr" prefix
             chrom2 = chrom2.replace("chr", "")
@@ -180,7 +184,7 @@ def search_vcfs(vcf_baseline, test_vcf, svlen, range_limit):
                 else:
                     # No matching position found
                     continue
-    return total_variants, shared_variants, shared_variants_vcf
+    return truth_total_variants, shared_variants, shared_variants_vcf, test_vcf_variants
 
 
 def compare_vcfs(vcf_baseline, test_vcf, range_limit):
@@ -196,15 +200,6 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
         caller_test = "truth"
     else:
         caller_test = caller_test
-    #print(caller_test)
-    if ("melt" in caller_base or caller_test) or ("mobster" in caller_base or caller_test):
-        print("Checking with SVLEN")
-        svlen = True
-    elif "scramble" in caller_base or caller_test:
-        svlen = False
-        #extract svlen from len(ALT) - len(REF)
-    else:
-        print("only truth set")
 
     try:
         vcf_reader_base = VCF(vcf_baseline) #vcf.Reader(open(vcf_baseline, 'r'))
@@ -220,18 +215,19 @@ def compare_vcfs(vcf_baseline, test_vcf, range_limit):
         # skip to next one
         return None, None, None, None
 
-    total_variants, shared_variants, shared_variants_vcf = search_vcfs(
-        vcf_reader_base, vcf_reader_test, svlen, range_limit
+    truth_total_variants, shared_variants, shared_variants_vcf, test_vcf_variants = search_vcfs(
+        vcf_reader_base, vcf_reader_test, range_limit
         )
 
-    shared_percentage = (shared_variants / total_variants) * 100 if total_variants > 0 else 0
+    shared_percentage = (shared_variants / truth_total_variants) * 100 if truth_total_variants > 0 else 0
 
     print("Summary Statistics:")
-    print(f"Total variants in baseline VCF: {total_variants}")
+    print(f"Total variants in test VCF: {test_vcf_variants}")
+    print(f"Total variants in baseline VCF: {truth_total_variants}")
     print(f"Variants shared between the two VCFs: {shared_variants}")
     print(f"Percentage of shared variants: {shared_percentage:.2f}%")
     #print(shared_variants_vcf)
-    return shared_variants_vcf, shared_percentage, shared_variants, total_variants
+    return shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants
 
 
 def run_for_multiple_samples(args):
@@ -269,13 +265,14 @@ def run_for_multiple_samples(args):
             truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
             vcf_baseline = f"{truth_path}valid_Truth_{sample}.vcf"
             # Run the comparison
-            shared_variants_vcf, shared_percentage, shared_variants, total_variants = \
+            shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants = \
                 compare_vcfs(vcf_baseline, test_vcf, args.range_limit)
             # Create a dictionary with the results
             result_dict = {
                 "Sample_ID": sample,
                 "Tool": tool,
-                "Total_Variants": total_variants,
+                "truth_total_variants": truth_total_variants,
+                "test_vcf_variants": test_vcf_variants,
                 "Shared_Variants": shared_variants,
                 "Shared_Percentage": shared_percentage,
                 "Shared_Variants_VCF": shared_variants_vcf
@@ -296,4 +293,3 @@ if __name__ == "__main__":
         compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
     elif args.mode == "multi":
         run_for_multiple_samples(args)
-    #compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
