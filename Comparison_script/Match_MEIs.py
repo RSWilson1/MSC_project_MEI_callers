@@ -7,7 +7,7 @@ It bases this on different criteria:
 
 It also reports the percentage of variants shared between the two VCFs.
 Returns a summary of the number of variants shared between the two VCFs.
-CSV??
+
 """
 #import vcf
 from cyvcf2 import VCF
@@ -27,8 +27,8 @@ def parse_args():
     """
     Parses command line arguments.
     Example usage:
-    Single Sample Mode: python Match_SV_v3.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
-    Multi-Sample Mode: python Match_SV_v3.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
+    Single Sample Mode: python Match_MEIs.py single -baseline /path/to/baseline.vcf -test /path/to/test.vcf -range_limit 50
+    Multi-Sample Mode: python Match_MEIs.py multi -vcf_list sample1.vcf sample2.vcf sample3.vcf -range_limit 50
     """
     parser = argparse.ArgumentParser(description="Compare variants in VCF files.")
 
