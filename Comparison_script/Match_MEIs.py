@@ -13,6 +13,7 @@ Returns a summary of the number of variants shared between the two VCFs.
 from cyvcf2 import VCF
 import argparse
 import pandas as pd
+import os
 
 LST_OF_CHRS = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7',
                         'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13',
@@ -32,19 +33,34 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Compare variants in VCF files.")
 
-    parser.add_argument("-range_limit", type=int, default=50, help="Position range within which variants are considered similar.")
+    parser.add_argument(
+        "-range_limit", type=int, default=50,
+        help="Position range within which variants are considered similar."
+        )
 
     # mode_group = parser.add_mutually_exclusive_group(required=True)
-    parser.add_argument("mode", choices=["single", "multi"], help="Choose between single and multi-sample mode.")
+    parser.add_argument(
+        "mode", choices=["single", "multi", "filter"],
+        help="Choose between single and multi-sample mode or multi-sample filter mode to compare melt vcf files."
+        )
 
     # Single-sample mode sub-arguments
     single_group = parser.add_argument_group("Single Sample Mode Options")
-    single_group.add_argument("-baseline", dest="vcf_baseline", help="Path to the baseline VCF file for single-sample mode.")
-    single_group.add_argument("-test", dest="test_vcf", help="Path to the test VCF file for single-sample mode.")
+    single_group.add_argument(
+        "-baseline", dest="vcf_baseline",
+        help="Path to the baseline VCF file for single-sample mode."
+        )
+    single_group.add_argument(
+        "-test", dest="test_vcf",
+        help="Path to the test VCF file for single-sample mode."
+        )
 
     # Multi-sample mode sub-arguments
     multi_group = parser.add_argument_group("Multi Sample Mode Options")
-    multi_group.add_argument("-vcf_list", nargs="+", help="List of VCF files for multi-sample mode.")
+    multi_group.add_argument(
+        "-vcf_list", nargs="+",
+        help="List of VCF files for multi-sample mode."
+        )
 
     arguments = parser.parse_args()
 
@@ -287,9 +303,76 @@ def run_for_multiple_samples(args):
     csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
+def compare_filters(args):
+    def run_for_multiple_samples(args):
+    """
+    Run the comparison for multiple samples.
+    """
+    # Assuming you have a list of sample IDs
+    # HG00096 HG00268 HG00419 HG00759 HG01051 HG01112 HG01500 HG01565 HG01583 HG01595 HG01879 HG02568 HG02922 HG03006 HG03052 HG03642 HG03742 NA18525 NA18939 NA19017 NA19625 NA19648 NA20502 NA20845 NA12878 NA19238 NA19239 NA19240
+    sample_ids = args.vcf_list
+    results = []
+
+    # Tool specific
+    tool = "MELT"
+    # Get the path to the baseline VCF
+    base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+
+    for sample in sample_ids:
+        # Construct the paths for the original and filtered VCFs
+        test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+        test_vcf_filtered = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
+        vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
+
+        # Compare original test VCF with truth VCF
+        shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
+            compare_vcfs(vcf_baseline, test_vcf_original, args.range_limit)
+
+        # Compare filtered test VCF with truth VCF
+        shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
+            compare_vcfs(vcf_baseline, test_vcf_filtered, args.range_limit)
+
+        # Create a dictionary with the results for the original VCF
+        result_dict_original = {
+            "Sample_ID": sample,
+            "Tool": tool,
+            "truth_total_variants": truth_total_variants,
+            "test_vcf_variants": test_vcf_variants_original,
+            "Shared_Variants": shared_variants_original,
+            "Shared_Percentage": shared_percentage_original,
+            "Shared_Variants_VCF": shared_variants_vcf_original,
+            "Filtered": False  # Indicates it's the original VCF
+        }
+
+        # Create a dictionary with the results for the filtered VCF
+        result_dict_filtered = {
+            "Sample_ID": sample,
+            "Tool": tool,
+            "truth_total_variants": truth_total_variants,
+            "test_vcf_variants": test_vcf_variants_filtered,
+            "Shared_Variants": shared_variants_filtered,
+            "Shared_Percentage": shared_percentage_filtered,
+            "Shared_Variants_VCF": shared_variants_vcf_filtered,
+            "Filtered": True  # Indicates it's the filtered VCF
+        }
+
+        # Append both dictionaries to the results list
+        results.append(result_dict_original)
+        results.append(result_dict_filtered)
+
+    # Create a DataFrame from the results list
+    df = pd.DataFrame(results)
+
+    # Write the DataFrame to a CSV file
+    csv_filename = "test_results.csv"
+    df.to_csv(csv_filename, index=False)
+
 if __name__ == "__main__":
     args = parse_args()
     if args.mode == "single":
         compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
     elif args.mode == "multi":
         run_for_multiple_samples(args)
+    elif args.mode == "filter":
+        compare_filters(args)
