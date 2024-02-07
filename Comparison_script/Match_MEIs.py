@@ -397,10 +397,24 @@ def compare_multi_filters(args):
         # List of filtered VCF paths
         filtered_vcf_paths = [test_vcf_filtered_comp, test_vcf_filtered_ASSESS_ONLY, test_vcf_filtered_PASS_ONLY, test_vcf_filtered_STRICT]
 
-        for filtered_vcf_path in filtered_vcf_paths:
-            # Compare original test VCF with truth VCF
-            shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
+        # Compare original test VCF with truth VCF
+        shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
                 compare_vcfs(vcf_baseline, test_vcf_original, args.range_limit)
+
+        # Create a dictionary with the results
+        result_dict = {
+                "Sample_ID": sample,
+                "Tool": tool,
+                "Filter_Type": "Raw", # i.e. no filter
+                "truth_total_variants": truth_total_variants,
+                "test_vcf_variants": test_vcf_variants_original,
+                "Shared_Variants": shared_variants_original,
+                "Shared_Percentage": shared_percentage_original,
+                "Shared_Variants_VCF": shared_variants_vcf_original,
+                "Filtered": False  # Indicates it's the filtered VCF
+            }
+
+        for filtered_vcf_path in filtered_vcf_paths:
 
             # Compare filtered test VCF with truth VCF
             shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
