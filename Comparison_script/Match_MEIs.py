@@ -40,7 +40,7 @@ def parse_args():
 
     # mode_group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument(
-        "mode", choices=["single", "multi", "filter"],
+        "mode", choices=["single", "multi", "filter", "multi_filters"],
         help="Choose between single and multi-sample mode or multi-sample filter mode to compare melt vcf files."
         )
 
@@ -303,7 +303,7 @@ def run_for_multiple_samples(args):
     csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
-def compare_filters(args):
+def compare_filtered(args):
     """
     Run the comparison for multiple samples.
     """
@@ -321,7 +321,10 @@ def compare_filters(args):
     for sample in sample_ids:
         # Construct the paths for the original and filtered VCFs
         test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
-        test_vcf_filtered = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
+        test_vcf_filtered_comp = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
+        # test_vcf_filtered_ASSESS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_ASSESS_only.vcf.gz")
+        # test_vcf_filtered_PASS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_PASS_only.vcf.gz")
+        # test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
         vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
 
         # Compare original test VCF with truth VCF
@@ -330,7 +333,7 @@ def compare_filters(args):
 
         # Compare filtered test VCF with truth VCF
         shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
-            compare_vcfs(vcf_baseline, test_vcf_filtered, args.range_limit)
+            compare_vcfs(vcf_baseline, test_vcf_filtered_comp, args.range_limit)
 
         # Create a dictionary with the results for the original VCF
         result_dict_original = {
@@ -367,6 +370,68 @@ def compare_filters(args):
     csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
+
+def compare_multi_filters(args):
+    """
+    Run the comparison for multiple samples with multiple filters.
+    """
+    # Assuming you have a list of sample IDs
+    sample_ids = args.vcf_list
+    results = []
+
+    # Tool specific
+    tool = "MELT"
+    # Get the path to the baseline VCF
+    base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+
+    for sample in sample_ids:
+        # Construct the paths for the original and filtered VCFs
+        test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+        test_vcf_filtered_comp = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
+        test_vcf_filtered_ASSESS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_ASSESS_only.vcf.gz")
+        test_vcf_filtered_PASS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_PASS_only.vcf.gz")
+        test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
+        vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
+
+        # List of filtered VCF paths
+        filtered_vcf_paths = [test_vcf_filtered_comp, test_vcf_filtered_ASSESS_ONLY, test_vcf_filtered_PASS_ONLY, test_vcf_filtered_STRICT]
+
+        for filtered_vcf_path in filtered_vcf_paths:
+            # Compare original test VCF with truth VCF
+            shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
+                compare_vcfs(vcf_baseline, test_vcf_original, args.range_limit)
+
+            # Compare filtered test VCF with truth VCF
+            shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
+                compare_vcfs(vcf_baseline, filtered_vcf_path, args.range_limit)
+
+            # Determine filter type from the filtered VCF path
+            filter_type = os.path.splitext(os.path.basename(filtered_vcf_path))[0].split("_")[-1]
+
+            # Create a dictionary with the results
+            result_dict = {
+                "Sample_ID": sample,
+                "Tool": tool,
+                "Filter_Type": filter_type,
+                "truth_total_variants": truth_total_variants,
+                "test_vcf_variants": test_vcf_variants_filtered,
+                "Shared_Variants": shared_variants_filtered,
+                "Shared_Percentage": shared_percentage_filtered,
+                "Shared_Variants_VCF": shared_variants_vcf_filtered,
+                "Filtered": True  # Indicates it's the filtered VCF
+            }
+
+            # Append the dictionary to the results list
+            results.append(result_dict)
+
+    # Create a DataFrame from the results list
+    df = pd.DataFrame(results)
+
+    # Write the DataFrame to a CSV file
+    csv_filename = "test_results.csv"
+    df.to_csv(csv_filename, index=False)
+
 if __name__ == "__main__":
     args = parse_args()
     if args.mode == "single":
@@ -374,4 +439,6 @@ if __name__ == "__main__":
     elif args.mode == "multi":
         run_for_multiple_samples(args)
     elif args.mode == "filter":
-        compare_filters(args)
+        compare_filtered(args)
+    elif args.mode == "multi_filters":
+        compare_multi_filters(args)
