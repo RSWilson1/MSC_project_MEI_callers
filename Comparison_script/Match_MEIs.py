@@ -304,7 +304,6 @@ def run_for_multiple_samples(args):
     df.to_csv(csv_filename, index=False)
 
 def compare_filters(args):
-    def run_for_multiple_samples(args):
     """
     Run the comparison for multiple samples.
     """
