@@ -394,8 +394,13 @@ def compare_multi_filters(args):
         test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
         vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
 
-        # List of filtered VCF paths
-        filtered_vcf_paths = [test_vcf_filtered_comp, test_vcf_filtered_ASSESS_ONLY, test_vcf_filtered_PASS_ONLY, test_vcf_filtered_STRICT]
+        # list of tuples of filtered VCF paths and filter types
+        filtered_vcf_paths = [
+            (test_vcf_filtered_comp, "comp"),
+            (test_vcf_filtered_ASSESS_ONLY, "ASSESS_ONLY"),
+            (test_vcf_filtered_PASS_ONLY, "PASS_ONLY"),
+            (test_vcf_filtered_STRICT, "STRICT")
+        ]
 
         # Compare original test VCF with truth VCF
         shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
@@ -413,15 +418,13 @@ def compare_multi_filters(args):
                 "Shared_Variants_VCF": shared_variants_vcf_original,
                 "Filtered": False  # Indicates it's the filtered VCF
             }
-
-        for filtered_vcf_path in filtered_vcf_paths:
+        results.append(result_dict)
+        #for loop over list of tuples filtered_vcf_paths and filter types:
+        for filtered_vcf_path, filter_type in filtered_vcf_paths:
 
             # Compare filtered test VCF with truth VCF
             shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
                 compare_vcfs(vcf_baseline, filtered_vcf_path, args.range_limit)
-
-            # Determine filter type from the filtered VCF path
-            filter_type = os.path.splitext(os.path.basename(filtered_vcf_path))[0].split("_")[-1]
 
             # Create a dictionary with the results
             result_dict = {
