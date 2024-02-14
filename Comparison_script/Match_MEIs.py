@@ -392,6 +392,7 @@ def compare_multi_filters(args):
         test_vcf_filtered_ASSESS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_ASSESS_only.vcf.gz")
         test_vcf_filtered_PASS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_PASS_only.vcf.gz")
         test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
+        test_vcf_filtered_SD = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_SD.vcf.gz")
         vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
 
         # list of tuples of filtered VCF paths and filter types
@@ -399,7 +400,8 @@ def compare_multi_filters(args):
             (test_vcf_filtered_comp, "comp"),
             (test_vcf_filtered_ASSESS_ONLY, "ASSESS_ONLY"),
             (test_vcf_filtered_PASS_ONLY, "PASS_ONLY"),
-            (test_vcf_filtered_STRICT, "STRICT")
+            (test_vcf_filtered_STRICT, "STRICT"),
+            (test_vcf_filtered_SD, "SD")
         ]
 
         # Compare original test VCF with truth VCF
