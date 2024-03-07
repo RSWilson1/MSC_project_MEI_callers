@@ -11,16 +11,16 @@ while IFS=$'\t' read -r file_id name folder; do
     # Remove the ".vcf.gz" extension from the file name
     name_no_extension="${name%.vcf.gz}"
 
-    # Construct the output file name without the extension
-    output_name="${name_no_extension}_filtered.vcf"
+    # Construct the output file names without the extension
+    test_vcf_filtered_SD="${name_no_extension}_filtered_SD.vcf"
 
     # Construct the BCFtools command with the appropriate file ID
-    bctools_cmd="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>3' ${name} -o ${output_name}; bgzip ${output_name}"
+    bctools_cmd_SD="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\"  | FILTER==\"lc\"' ${name} -o ${test_vcf_filtered_SD}; bgzip ${test_vcf_filtered_SD}"
 
     # Run the swiss_army_knife app with the constructed command
     dx run app-swiss-army-knife \
     -i in="${PROJECT_ID}":"${file_id}" \
-    -i cmd="$bctools_cmd" \
+    -i cmd="$bctools_cmd_SD" \
     --destination="${folder}" -y
 
     # Print a message indicating the completion of processing for the current file
