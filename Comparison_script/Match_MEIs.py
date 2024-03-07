@@ -517,7 +517,7 @@ def compare_assess_filters(args):
     df = pd.DataFrame(results)
 
     # Write the DataFrame to a CSV file
-    date = datetime.now().strftime("%Y-%m-%d")
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
     csv_filename = f"ASSESS_results_{date}.csv"
     df.to_csv(csv_filename, index=False)
 
