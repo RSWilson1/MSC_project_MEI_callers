@@ -14,13 +14,6 @@ cd /
 
 # Download files using aria2
 cd scratch/
-# /usr/bin/time --verbose aria2c -x 16 -s 16 ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/"$1"/alignment/"$1".mapped.ILLUMINA.bwa."$2".low_coverage.20120522.bam
-# /usr/bin/time --verbose aria2c -x 16 -s 16 ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/"$1"/alignment/"$1".mapped.ILLUMINA.bwa."$2".low_coverage.20120522.bam.bai
-# ID=$1
-# URL="ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/${ID}/alignment/"
-# /usr/bin/time --verbose wget -r -nd -A "${ID}*.bam" "$URL"
-# /usr/bin/time --verbose wget -r -nd -A "${ID}*.bam.bai" "$URL"
-# wget -r -nd -A '"$1"*.bam.bai' ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00096/alignment/
 
 URL=$2
 /usr/bin/time --verbose aria2c -x 16 -s 16 "${URL}"

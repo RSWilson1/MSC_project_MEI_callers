@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Specify the TSV file containing file IDs, names, and folders
-TSV_FILE="melt_file_ids.tsv"
+TSV_FILE="melt_file_ids_fixed.tsv"
 
 # Specify the project ID
 PROJECT_ID="project-GQ8p00041kgj8VXvGVQ64V21"

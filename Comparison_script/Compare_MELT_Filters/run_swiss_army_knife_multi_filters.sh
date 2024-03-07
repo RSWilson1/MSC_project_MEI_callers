@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Specify the TSV file containing file IDs, names, and folders
-TSV_FILE="melt_retry_HG01112.tsv" #"melt_file_ids.tsv"
+TSV_FILE="melt_file_ids_fixed.tsv"
 
 # Specify the project ID
 PROJECT_ID="project-GQ8p00041kgj8VXvGVQ64V21"
@@ -16,32 +16,38 @@ while IFS=$'\t' read -r file_id name folder; do
     test_vcf_filtered_ASSESS_ONLY="${name_no_extension}_filtered_ASSESS_only.vcf"
     test_vcf_filtered_PASS_ONLY="${name_no_extension}_filtered_PASS_only.vcf"
     test_vcf_filtered_STRICT="${name_no_extension}_filtered_strict.vcf"
-
+    test_vcf_filtered_ultra_strict="${name_no_extension}_filtered_ultra_strict.vcf"
     # Construct the BCFtools command with the appropriate file ID
-    bctools_cmd_comp="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>3' ${name} -o ${test_vcf_filtered_comp}; bgzip ${test_vcf_filtered_comp}"
-    bctools_cmd_ASSESS_only="tabix -p vcf ${name}; bcftools view -i 'ASSESS==5' ${name} -o ${test_vcf_filtered_ASSESS_ONLY}; bgzip ${test_vcf_filtered_ASSESS_ONLY}"
-    bctools_cmd_PASS_only="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\"' ${name} -o ${test_vcf_filtered_PASS_ONLY}; bgzip ${test_vcf_filtered_PASS_ONLY}"
-    bctools_cmd_strict="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>3 & LP>=1 & RP>=1' ${name} -o ${test_vcf_filtered_STRICT}; bgzip ${test_vcf_filtered_STRICT}"
+    bcftools_cmd_comp="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>3' ${name} -o ${test_vcf_filtered_comp}; bgzip ${test_vcf_filtered_comp}"
+    bcftools_cmd_ASSESS_only="tabix -p vcf ${name}; bcftools view -i 'ASSESS==5' ${name} -o ${test_vcf_filtered_ASSESS_ONLY}; bgzip ${test_vcf_filtered_ASSESS_ONLY}"
+    bcftools_cmd_PASS_only="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\"' ${name} -o ${test_vcf_filtered_PASS_ONLY}; bgzip ${test_vcf_filtered_PASS_ONLY}"
+    bcftools_cmd_strict="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>3 & LP>=1 & RP>=1' ${name} -o ${test_vcf_filtered_STRICT}; bgzip ${test_vcf_filtered_STRICT}"
+    bcftools_cmd_ultra_strict="tabix -p vcf ${name}; bcftools view -i 'FILTER==\"PASS\" & ASSESS>5 & LP>=2 & RP>=2' ${name} -o ${test_vcf_filtered_ultra_strict}; bgzip ${test_vcf_filtered_ultra_strict}"
 
     # Run the swiss_army_knife app with the constructed command
-    dx run app-swiss-army-knife \
-    -i in="${PROJECT_ID}":"${file_id}" \
-    -i cmd="$bctools_cmd_comp" \
-    --destination="${folder}" -y
+    # dx run app-swiss-army-knife \
+    # -i in="${PROJECT_ID}":"${file_id}" \
+    # -i cmd="$bcftools_cmd_comp" \
+    # --destination="${folder}" -y
+
+    # dx run app-swiss-army-knife \
+    # -i in="${PROJECT_ID}":"${file_id}" \
+    # -i cmd="$bcftools_cmd_ASSESS_only" \
+    # --destination="${folder}" -y
+
+    # dx run app-swiss-army-knife \
+    # -i in="${PROJECT_ID}":"${file_id}" \
+    # -i cmd="$bcftools_cmd_PASS_only" \
+    # --destination="${folder}" -y
+
+    # dx run app-swiss-army-knife \
+    # -i in="${PROJECT_ID}":"${file_id}" \
+    # -i cmd="$bcftools_cmd_strict" \
+    # --destination="${folder}" -y
 
     dx run app-swiss-army-knife \
     -i in="${PROJECT_ID}":"${file_id}" \
-    -i cmd="$bctools_cmd_ASSESS_only" \
-    --destination="${folder}" -y
-
-    dx run app-swiss-army-knife \
-    -i in="${PROJECT_ID}":"${file_id}" \
-    -i cmd="$bctools_cmd_PASS_only" \
-    --destination="${folder}" -y
-
-    dx run app-swiss-army-knife \
-    -i in="${PROJECT_ID}":"${file_id}" \
-    -i cmd="$bctools_cmd_strict" \
+    -i cmd="$bcftools_cmd_ultra_strict" \
     --destination="${folder}" -y
 
     # Print a message indicating the completion of processing for the current file
