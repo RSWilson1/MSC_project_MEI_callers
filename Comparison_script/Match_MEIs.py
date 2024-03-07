@@ -14,6 +14,7 @@ from cyvcf2 import VCF
 import argparse
 import pandas as pd
 import os
+import datetime
 
 LST_OF_CHRS = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7',
                         'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13',
@@ -451,6 +452,76 @@ def compare_multi_filters(args):
     csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
+
+def compare_and_append_result(sample, tool, filter_type, test_vcf_path, vcf_baseline, range_limit, results):
+    """
+    Compare VCFs and append results to the list.
+    """
+    shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants = \
+        compare_vcfs(vcf_baseline, test_vcf_path, range_limit)
+
+    # Create a dictionary with the results
+    result_dict = {
+        "Sample_ID": sample,
+        "Tool": tool,
+        "Filter_Type": filter_type,
+        "truth_total_variants": truth_total_variants,
+        "test_vcf_variants": test_vcf_variants,
+        "Shared_Variants": shared_variants,
+        "Shared_Percentage": shared_percentage,
+        "Shared_Variants_VCF": shared_variants_vcf,
+        "Filtered": True if filter_type != "Raw" else False  # Indicates whether it's a filtered VCF
+    }
+
+    # Append the dictionary to the results list
+    results.append(result_dict)
+
+
+def compare_assess_filters(args):
+    """
+    Run the comparison for multiple samples with multiple filters.
+    """
+    # Assuming you have a list of sample IDs
+    sample_ids = args.vcf_list
+    results = []
+
+    # Tool specific
+    tool = "MELT"
+    # Get the path to the baseline VCF
+    base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+
+    for sample in sample_ids:
+        # Construct the paths for the original and filtered VCFs
+        test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+        vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
+
+        # Comparison for original VCF
+        compare_and_append_result(sample, tool, "Raw", test_vcf_original, vcf_baseline, args.range_limit, results)
+
+        # List of filtered VCF paths and filter types
+        filtered_vcf_paths = {
+            "ASSESS_1": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_1.vcf",
+            "ASSESS_2": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_2.vcf",
+            "ASSESS_3": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_3.vcf",
+            "ASSESS_4": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_4.vcf",
+            "ASSESS_5": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_5.vcf"
+        }
+
+        # Comparison for filtered VCFs
+        for filter_type, filtered_vcf_filename in filtered_vcf_paths.items():
+            filtered_vcf_path = os.path.join(base_path, sample, tool, filtered_vcf_filename)
+            compare_and_append_result(sample, tool, filter_type, filtered_vcf_path, vcf_baseline, args.range_limit, results)
+
+    # Create a DataFrame from the results list
+    df = pd.DataFrame(results)
+
+    # Write the DataFrame to a CSV file
+    date = datetime.now().strftime("%Y-%m-%d")
+    csv_filename = f"ASSESS_results_{date}.csv"
+    df.to_csv(csv_filename, index=False)
+
+
 if __name__ == "__main__":
     args = parse_args()
     if args.mode == "single":
@@ -461,3 +532,5 @@ if __name__ == "__main__":
         compare_filtered(args)
     elif args.mode == "multi_filters":
         compare_multi_filters(args)
+    elif args.mode == "assess_filters":
+        compare_assess_filters(args)
