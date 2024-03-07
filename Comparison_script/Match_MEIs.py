@@ -524,6 +524,8 @@ def compare_assess_filters(args):
 
 if __name__ == "__main__":
     args = parse_args()
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    print(date)
     if args.mode == "single":
         compare_vcfs(args.vcf_baseline, args.test_vcf, args.range_limit)
     elif args.mode == "multi":
