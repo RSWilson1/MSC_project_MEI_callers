@@ -501,11 +501,11 @@ def compare_assess_filters(args):
 
         # List of filtered VCF paths and filter types
         filtered_vcf_paths = {
-            "ASSESS_1": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_1.vcf",
-            "ASSESS_2": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_2.vcf",
-            "ASSESS_3": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_3.vcf",
-            "ASSESS_4": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_4.vcf",
-            "ASSESS_5": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_5.vcf"
+            "ASSESS_1": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_1.vcf.gz",
+            "ASSESS_2": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_2.vcf.gz",
+            "ASSESS_3": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_3.vcf.gz",
+            "ASSESS_4": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_4.vcf.gz",
+            "ASSESS_5": f"{sample}_{tool}_concat_filtered_ASSESS_eqgt_5.vcf.gz"
         }
 
         # Comparison for filtered VCFs
