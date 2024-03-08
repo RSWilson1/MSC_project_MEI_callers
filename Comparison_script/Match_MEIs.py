@@ -142,10 +142,8 @@ def search_vcfs(vcf_baseline, test_vcf, range_limit):
     for record1 in vcf_baseline:
         truth_total_variants += 1
         chrom = record1.CHROM
-        print(type(chrom))
-        print(chrom)
         if chrom not in LST_OF_CHRS:
-            print(f"rejected - {chrom}")
+            #print(f"rejected - {chrom}")
             continue
         #remove scramble dels
         id1 = record1.ID
