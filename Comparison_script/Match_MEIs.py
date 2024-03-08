@@ -138,15 +138,16 @@ def search_vcfs(vcf_baseline, test_vcf, range_limit):
 
     # Group variants by chromosome in vcf_baseline
     for record1 in vcf_baseline:
+        truth_total_variants += 1
         chrom = record1.CHROM
         if chrom not in LST_OF_CHRS:
-            #print(f"rejected - {chrom}")
+            print(f"rejected - {chrom}")
             continue
         #remove scramble dels
         id1 = record1.ID
         if id1 == "DEL":
             continue
-        truth_total_variants += 1
+        # old placement of code: truth_total_variants += 1
         if chrom.startswith("chr"):
             #print(chrom)
             #chrom = chrom[3:]  # Remove "chr" prefix # why not replace?
