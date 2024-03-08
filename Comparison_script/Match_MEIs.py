@@ -537,11 +537,6 @@ def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
     # Compare the MEIs between truth and test
     shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants = \
         compare_vcfs(truth_vcf_path, test_vcf_path, args.range_limit)
-    # Print the results
-    print(f"Comparison results for {sample_id} and {tool}:")
-    print(f"Number of truth MEIs not detected by MELT: {len(shared_variants)}")
-    print(f"Number of MEIs detected by {tool}: {len(test_vcf_variants)}")
-    print(f"Number of shared MEIs: {len(shared_variants_vcf)}")
     #append to df
     result_dict = {
         "Sample_ID": sample_id,
@@ -550,6 +545,7 @@ def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
         "Shared_Variants": shared_variants,
         "Shared_Percentage": shared_percentage,
         "test_vcf_variants": test_vcf_variants,
+        "Shared_Variants_VCF": shared_variants_vcf,
         "Filtered": False  # Indicates it's the original VCF
     }
     return result_dict
