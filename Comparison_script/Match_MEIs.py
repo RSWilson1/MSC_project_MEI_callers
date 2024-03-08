@@ -41,7 +41,7 @@ def parse_args():
 
     # mode_group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument(
-        "mode", choices=["single", "multi", "filter", "multi_filters", "assess_filters"],
+        "mode", choices=["single", "multi", "filter", "multi_filters", "assess_filters", "compare_MELT_missed_MEIs"],
         help="Choose between single and multi-sample mode or multi-sample filter mode to compare melt vcf files."
         )
 
