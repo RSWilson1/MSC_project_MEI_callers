@@ -525,6 +525,35 @@ def compare_assess_filters(args):
     df.to_csv(csv_filename, index=False)
 
 
+def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
+    """
+    Compare the MEIs missed by MELT for a sample.
+    In progress
+    """
+    # Get the path to the test VCF file
+    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+    truth_vcf_path = f"{truth_path}valid_Truth_HG03742_PCR_nomelt_variants.vcf"
+
+    # Compare the MEIs between truth and test
+    shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants = \
+        compare_vcfs(truth_vcf_path, test_vcf_path, args.range_limit)
+    # Print the results
+    print(f"Comparison results for {sample_id} and {tool}:")
+    print(f"Number of truth MEIs not detected by MELT: {len(shared_variants)}")
+    print(f"Number of MEIs detected by {tool}: {len(test_vcf_variants)}")
+    print(f"Number of shared MEIs: {len(shared_variants_vcf)}")
+    #append to df
+    result_dict = {
+        "Sample_ID": sample_id,
+        "Tool": tool,
+        "truth_total_variants": truth_total_variants,
+        "Shared_Variants": shared_variants,
+        "Shared_Percentage": shared_percentage,
+        "test_vcf_variants": test_vcf_variants,
+        "Filtered": False  # Indicates it's the original VCF
+    }
+    return result_dict
+
 if __name__ == "__main__":
     args = parse_args()
     date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -539,3 +568,11 @@ if __name__ == "__main__":
         compare_multi_filters(args)
     elif args.mode == "assess_filters":
         compare_assess_filters(args)
+    elif args.mode == "compare_MELT_missed_MEIs":
+        melt_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "MELT", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/MELT/HG03742_MELT_concat.vcf.gz")
+        scramble_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Scramble", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/scramble/HG03742_scramble.vcf")
+        mobster_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Mobster", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/mobster/HG03742_mobster_predictions.vcf")
+        #combine results in df
+        results = [melt_result, scramble_result, mobster_result]
+        df = pd.DataFrame(results)
+        df.to_csv(f"missed_MEIs_results_{date}.csv", index=False)
