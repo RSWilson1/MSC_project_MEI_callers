@@ -307,72 +307,72 @@ def run_for_multiple_samples(args):
     csv_filename = "test_results.csv"
     df.to_csv(csv_filename, index=False)
 
-def compare_filtered(args):
-    """
-    Run the comparison for multiple samples.
-    """
-    # Assuming you have a list of sample IDs
-    # HG00096 HG00268 HG00419 HG00759 HG01051 HG01112 HG01500 HG01565 HG01583 HG01595 HG01879 HG02568 HG02922 HG03006 HG03052 HG03642 HG03742 NA18525 NA18939 NA19017 NA19625 NA19648 NA20502 NA20845 NA12878 NA19238 NA19239 NA19240
-    sample_ids = args.vcf_list
-    results = []
+# def compare_filtered(args):
+#     """
+#     Run the comparison for multiple samples.
+#     """
+#     # Assuming you have a list of sample IDs
+#     # HG00096 HG00268 HG00419 HG00759 HG01051 HG01112 HG01500 HG01565 HG01583 HG01595 HG01879 HG02568 HG02922 HG03006 HG03052 HG03642 HG03742 NA18525 NA18939 NA19017 NA19625 NA19648 NA20502 NA20845 NA12878 NA19238 NA19239 NA19240
+#     sample_ids = args.vcf_list
+#     results = []
 
-    # Tool specific
-    tool = "MELT"
-    # Get the path to the baseline VCF
-    base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
-    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+#     # Tool specific
+#     tool = "MELT"
+#     # Get the path to the baseline VCF
+#     base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+#     truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
 
-    for sample in sample_ids:
-        # Construct the paths for the original and filtered VCFs
-        test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
-        test_vcf_filtered_comp = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
-        # test_vcf_filtered_ASSESS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_ASSESS_only.vcf.gz")
-        # test_vcf_filtered_PASS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_PASS_only.vcf.gz")
-        # test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
-        vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
+#     for sample in sample_ids:
+#         # Construct the paths for the original and filtered VCFs
+#         test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+#         test_vcf_filtered_comp = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered.vcf.gz")
+#         # test_vcf_filtered_ASSESS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_ASSESS_only.vcf.gz")
+#         # test_vcf_filtered_PASS_ONLY = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_PASS_only.vcf.gz")
+#         # test_vcf_filtered_STRICT = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat_filtered_strict.vcf.gz")
+#         vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
 
-        # Compare original test VCF with truth VCF
-        shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
-            compare_vcfs(vcf_baseline, test_vcf_original, args.range_limit)
+#         # Compare original test VCF with truth VCF
+#         shared_variants_vcf_original, shared_percentage_original, shared_variants_original, truth_total_variants, test_vcf_variants_original = \
+#             compare_vcfs(vcf_baseline, test_vcf_original, args.range_limit)
 
-        # Compare filtered test VCF with truth VCF
-        shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
-            compare_vcfs(vcf_baseline, test_vcf_filtered_comp, args.range_limit)
+#         # Compare filtered test VCF with truth VCF
+#         shared_variants_vcf_filtered, shared_percentage_filtered, shared_variants_filtered, _, test_vcf_variants_filtered = \
+#             compare_vcfs(vcf_baseline, test_vcf_filtered_comp, args.range_limit)
 
-        # Create a dictionary with the results for the original VCF
-        result_dict_original = {
-            "Sample_ID": sample,
-            "Tool": tool,
-            "truth_total_variants": truth_total_variants,
-            "test_vcf_variants": test_vcf_variants_original,
-            "Shared_Variants": shared_variants_original,
-            "Shared_Percentage": shared_percentage_original,
-            "Shared_Variants_VCF": shared_variants_vcf_original,
-            "Filtered": False  # Indicates it's the original VCF
-        }
+#         # Create a dictionary with the results for the original VCF
+#         result_dict_original = {
+#             "Sample_ID": sample,
+#             "Tool": tool,
+#             "truth_total_variants": truth_total_variants,
+#             "test_vcf_variants": test_vcf_variants_original,
+#             "Shared_Variants": shared_variants_original,
+#             "Shared_Percentage": shared_percentage_original,
+#             "Shared_Variants_VCF": shared_variants_vcf_original,
+#             "Filtered": False  # Indicates it's the original VCF
+#         }
 
-        # Create a dictionary with the results for the filtered VCF
-        result_dict_filtered = {
-            "Sample_ID": sample,
-            "Tool": tool,
-            "truth_total_variants": truth_total_variants,
-            "test_vcf_variants": test_vcf_variants_filtered,
-            "Shared_Variants": shared_variants_filtered,
-            "Shared_Percentage": shared_percentage_filtered,
-            "Shared_Variants_VCF": shared_variants_vcf_filtered,
-            "Filtered": True  # Indicates it's the filtered VCF
-        }
+#         # Create a dictionary with the results for the filtered VCF
+#         result_dict_filtered = {
+#             "Sample_ID": sample,
+#             "Tool": tool,
+#             "truth_total_variants": truth_total_variants,
+#             "test_vcf_variants": test_vcf_variants_filtered,
+#             "Shared_Variants": shared_variants_filtered,
+#             "Shared_Percentage": shared_percentage_filtered,
+#             "Shared_Variants_VCF": shared_variants_vcf_filtered,
+#             "Filtered": True  # Indicates it's the filtered VCF
+#         }
 
-        # Append both dictionaries to the results list
-        results.append(result_dict_original)
-        results.append(result_dict_filtered)
+#         # Append both dictionaries to the results list
+#         results.append(result_dict_original)
+#         results.append(result_dict_filtered)
 
-    # Create a DataFrame from the results list
-    df = pd.DataFrame(results)
+#     # Create a DataFrame from the results list
+#     df = pd.DataFrame(results)
 
-    # Write the DataFrame to a CSV file
-    csv_filename = "test_results.csv"
-    df.to_csv(csv_filename, index=False)
+#     # Write the DataFrame to a CSV file
+#     csv_filename = "test_results.csv"
+#     df.to_csv(csv_filename, index=False)
 
 
 def compare_multi_filters(args):
