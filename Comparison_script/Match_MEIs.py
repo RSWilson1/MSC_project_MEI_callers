@@ -578,10 +578,10 @@ def compareLPRP(args):
 
         # List of filtered VCF paths and filter types
         filtered_vcf_paths = {
-            "LPRP_2": f"{sample}_{tool}_concat_filtered_LPRP2.vcf.gz",
-            "LPRP_3": f"{sample}_{tool}_concat_filtered_LPRP3.vcf.gz",
-            "LPRP_4": f"{sample}_{tool}_concat_filtered_LPRP4.vcf.gz",
-            "LPRP_5": f"{sample}_{tool}_concat_filtered_LPRP5.vcf.gz",
+            "LPRP_2": f"{sample}_{tool}_concat_filtered_LPRP_2.vcf.gz",
+            "LPRP_3": f"{sample}_{tool}_concat_filtered_LPRP_3.vcf.gz",
+            "LPRP_4": f"{sample}_{tool}_concat_filtered_LPRP_4.vcf.gz",
+            "LPRP_5": f"{sample}_{tool}_concat_filtered_LPRP_5.vcf.gz",
         }
 
         # Comparison for filtered VCFs
