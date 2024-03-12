@@ -567,7 +567,7 @@ def compareLPRP(args):
     # Get the path to the baseline VCF
     base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
     truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
-    test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+
     for sample in sample_ids:
         # Construct the paths for the original and filtered VCFs
         test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
