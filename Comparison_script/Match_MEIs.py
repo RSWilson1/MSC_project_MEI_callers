@@ -43,7 +43,8 @@ def parse_args():
 
     # mode_group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument(
-        "mode", choices=["single", "multi", "filter", "multi_filters", "assess_filters", "compare_MELT_missed_MEIs"],
+        "mode", choices=["single", "multi", "filter", "multi_filters",
+                         "assess_filters", "compare_MELT_missed_MEIs", "compare_LPRP"],
         help="Choose between single and multi-sample mode or multi-sample filter mode to compare melt vcf files."
         )
 
@@ -553,6 +554,49 @@ def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
     }
     return result_dict
 
+def compareLPRP(args):
+    """
+    Run the comparison for multiple samples with multiple filters.
+    """
+    # Assuming you have a list of sample IDs
+    sample_ids = args.vcf_list
+    results = []
+
+    # Tool specific
+    tool = "MELT"
+    # Get the path to the baseline VCF
+    base_path = "/project/003_230901_MSc_MEI_detection/benchmarking_output"
+    truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
+    test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+    for sample in sample_ids:
+        # Construct the paths for the original and filtered VCFs
+        test_vcf_original = os.path.join(base_path, sample, tool, f"{sample}_{tool}_concat.vcf.gz")
+        vcf_baseline = os.path.join(truth_path, f"valid_Truth_{sample}.vcf")
+
+        # Comparison for original VCF
+        compare_and_append_result(sample, tool, "Raw", test_vcf_original, vcf_baseline, args.range_limit, results)
+
+        # List of filtered VCF paths and filter types
+        filtered_vcf_paths = {
+            "LPRP_2": f"{sample}_{tool}_concat_filtered_LPRP2.vcf.gz",
+            "LPRP_3": f"{sample}_{tool}_concat_filtered_LPRP3.vcf.gz",
+            "LPRP_4": f"{sample}_{tool}_concat_filtered_LPRP4.vcf.gz",
+            "LPRP_5": f"{sample}_{tool}_concat_filtered_LPRP5.vcf.gz",
+        }
+
+        # Comparison for filtered VCFs
+        for filter_type, filtered_vcf_filename in filtered_vcf_paths.items():
+            filtered_vcf_path = os.path.join(base_path, sample, tool, filtered_vcf_filename)
+            compare_and_append_result(sample, tool, filter_type, filtered_vcf_path, vcf_baseline, args.range_limit, results)
+
+    # Create a DataFrame from the results list
+    df_LPRP = pd.DataFrame(results)
+    # Write the DataFrame to a CSV file
+    date_today = datetime.datetime.now().strftime("%Y-%m-%d")
+    csv_filename = f"LPRP_results_{date_today}.csv"
+    df_LPRP.to_csv(csv_filename, index=False)
+
+
 if __name__ == "__main__":
     args = parse_args()
     date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -575,3 +619,6 @@ if __name__ == "__main__":
         results = [melt_result, scramble_result, mobster_result]
         df = pd.DataFrame(results)
         df.to_csv(f"missed_MEIs_results_{date}.csv", index=False)
+    elif args.mode == "compare_LPRP":
+        compareLPRP(args)
+
