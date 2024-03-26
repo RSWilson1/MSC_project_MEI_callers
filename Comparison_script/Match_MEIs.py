@@ -612,11 +612,16 @@ if __name__ == "__main__":
     elif args.mode == "assess_filters":
         compare_assess_filters(args)
     elif args.mode == "compare_MELT_missed_MEIs":
-        melt_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "MELT", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/MELT/HG03742_MELT_concat.vcf.gz")
-        scramble_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Scramble", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/scramble/HG03742_scramble.vcf")
-        mobster_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Mobster", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/mobster/HG03742_mobster_predictions.vcf")
+        HG03742_melt_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "MELT", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/MELT/HG03742_MELT_concat.vcf.gz")
+        HG03742_scramble_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Scramble", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/scramble/HG03742_scramble.vcf")
+        HG03742_mobster_result = compare_MELT_missed_MEIs_for_sample(args, "HG03742", "Mobster", "/project/003_230901_MSc_MEI_detection/benchmarking_output/HG03742/mobster/HG03742_mobster_predictions.vcf")
+        NA19017_melt_result = compare_MELT_missed_MEIs_for_sample(args, "NA19017", "MELT", "/project/003_230901_MSc_MEI_detection/benchmarking_output/NA19017/MELT/HG03742_MELT_concat.vcf.gz")
+        NA19017_scramble_result = compare_MELT_missed_MEIs_for_sample(args, "NA19017", "Scramble", "/project/003_230901_MSc_MEI_detection/benchmarking_output/NA19017/scramble/NA19017_scramble.vcf")
+        NA19017_mobster_result = compare_MELT_missed_MEIs_for_sample(args, "NA19017", "Mobster", "/project/003_230901_MSc_MEI_detection/benchmarking_output/NA19017/mobster/NA19017_mobster_predictions.vcf")
+
         #combine results in df
-        results = [melt_result, scramble_result, mobster_result]
+        results = [HG03742_melt_result, HG03742_scramble_result, HG03742_mobster_result,
+                   NA19017_melt_result, NA19017_scramble_result, NA19017_mobster_result]
         df = pd.DataFrame(results)
         df.to_csv(f"missed_MEIs_results_{date}.csv", index=False)
     elif args.mode == "compare_LPRP":
