@@ -536,8 +536,7 @@ def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
     """
     # Get the path to the test VCF file
     truth_path = "/project/003_230901_MSc_MEI_detection/1000G_truth_vcfs/"
-    truth_vcf_path = f"{truth_path}valid_Truth_HG03742_PCR_nomelt_variants.vcf"
-
+    truth_vcf_path = f"{truth_path}valid_Truth_{sample_id}_PCR_nomelt_variants.vcf"
     # Compare the MEIs between truth and test
     shared_variants_vcf, shared_percentage, shared_variants, truth_total_variants, test_vcf_variants = \
         compare_vcfs(truth_vcf_path, test_vcf_path, args.range_limit)
@@ -553,6 +552,7 @@ def compare_MELT_missed_MEIs_for_sample(args, sample_id, tool, test_vcf_path):
         "Filtered": False  # Indicates it's the original VCF
     }
     return result_dict
+
 
 def compareLPRP(args):
     """
