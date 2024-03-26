@@ -22,7 +22,7 @@ mkdir -p /scratch/"$1"/
 
 /usr/bin/time --verbose java -jar ./opt/MELTv2.2.2/MELT.jar Single -a -b hs37d5/NC_007605 \
   -h scratch/hs37d5.fa \
-  -bamfile project/003_230901_MSc_MEI_detection/HG002/hs37d5_aligned_240320/HG002.hs37d5.60x.1.bam \
+  -bamfile project/003_230901_MSc_MEI_detection/HG002/hs37d5_aligned_240320/HG002.hs37d5.60x_sorted.1.bam \
   -n ./opt/MELTv2.2.2/add_bed_files/1KGP_Hg19/hg19.genes.bed \
   -t project/003_230901_MSc_MEI_detection/test_MELT_docker/mei_list_complete_dockerenv.txt \
   -w scratch/"$1"/
